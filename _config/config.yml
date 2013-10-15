@@ -1,0 +1,15 @@
+---
+Name: timednotices
+After:
+  - '#rootroutes'
+  - '#modelascontrollerroutes'
+---
+Director:
+  rules:
+   'timednotice//$Action/$ID/$OtherID': 'TimedNoticeController'
+
+LeftAndMain:
+  extra_requirements_javascript:
+    - 'timednotices/javascript/timednotices-cms.js'
+  extra_requirements_css:
+    - 'timednotices/css/timednotices-cms.css'
