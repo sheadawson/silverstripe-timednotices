@@ -1,6 +1,6 @@
 #Silverstripe Timed Notices
 
-Allows ADMIN users to create and display notices to other CMS users for the duration of a specified time period.
+Allows CMS users to create and display notices to other CMS users for the duration of a specified time period. Notices can be made visible to any logged in users or only people from specified user groups.
 
 ##Example
 
