@@ -1,0 +1,24 @@
+{
+	"name": "sheadawson/silverstripe-timednotices",
+	"description": "Display notice banners in the cms interface over a given time period. Good for notifying cms users of scheduled updates or downtime etc.",
+	"type": "silverstripe-module",
+	"keywords": ["silverstripe", "notification"],
+	"homepage": "http://github.com/sheadawson/silverstripe-timednotices",
+	"authors": [
+	{
+		"name": "Shea Dawson",
+		"email": "shea@silverstripe.com.au"
+	}
+	],
+	"require":
+	{
+		"composer/installers": "*",
+		"silverstripe/framework": "3.*"
+	},
+	"extra": {
+		"installer-name": "timednotices"
+	},
+	"suggest": {
+        "unclecheese/display-logic": "Improves usibility in TimedNotice edit form"
+    }
+}

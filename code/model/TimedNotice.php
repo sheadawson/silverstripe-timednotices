@@ -77,7 +77,7 @@ class TimedNotice extends DataObject implements PermissionProvider {
 		$fields->addFieldToTab('Root.Main', DropdownField::create(
 			'MessageType', 
 			'Message Type', 
-			$this->config()->get('message_types')
+			ArrayLib::valuekey($this->config()->get('message_types'))
 		));
 
 		$fields->addFieldToTab(

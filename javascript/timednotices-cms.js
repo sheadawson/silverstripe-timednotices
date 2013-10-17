@@ -23,20 +23,21 @@
 				}
 
 				$.getJSON('timednotice/notices', function(data){
-					container.html('');
-					$(data).each(function(){
-						container.append($("<p />")
-							.addClass('message')
-							.addClass(this.MessageType)
-							.html(this.Message)
-							.html(this.Message)
-						);
-					});
-					container.show();
-					$(window).trigger('resize');		
-					stashedNotices = container.html();
+					if(data.length){
+						container.html('');
+						$(data).each(function(){
+							container.append($("<p />")
+								.addClass('message')
+								.addClass(this.MessageType)
+								.html(this.Message)
+								.html(this.Message)
+							);
+						});
+						container.show();
+						$(window).trigger('resize');		
+						stashedNotices = container.html();
+					}
 				});
-				
 			}
 		});
 	});
