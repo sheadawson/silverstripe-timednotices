@@ -8,7 +8,7 @@ Allows CMS users to create and display notices to other CMS users for the durati
 
 ##Requirements
 
-SilverStripe 3.*
+SilverStripe 3.1
 
 ##Install
 

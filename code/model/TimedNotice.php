@@ -22,6 +22,10 @@ class TimedNotice extends DataObject implements PermissionProvider {
 		'ViewerGroups' 	=> 'Group'
 	);
 
+	private static $defaults = array(
+		'CanViewType' 	=> 'LoggedInUsers'
+	);
+
 	private static $summary_fields = array(
 		'StartTime' 	=> "Start Time",
 		'EndTime'		=> "End Time",
@@ -78,7 +82,7 @@ class TimedNotice extends DataObject implements PermissionProvider {
 			'MessageType', 
 			'Message Type', 
 			ArrayLib::valuekey($this->config()->get('message_types'))
-		));
+		), 'Message');
 
 		$fields->addFieldToTab(
 			'Root.Main', 
