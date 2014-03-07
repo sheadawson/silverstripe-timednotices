@@ -8,7 +8,9 @@
 class TimedNoticeController extends Controller{
 
 	private static $allowed_actions = array(
-		'notices'
+		'notices',
+		'snooze',
+		
 	);
 
 
@@ -37,5 +39,24 @@ class TimedNoticeController extends Controller{
 		}
 
 		return Convert::array2json($notices->toNestedArray());
+	}
+	
+	public function snooze() {
+		if (!Permission::check('TIMEDNOTICE_EDIT')) {
+			return;
+		}
+		
+		$id = (int) $this->request->postVar('ID');
+		$increase = (int) $this->request->postVar('plus');
+
+		if ($id) {
+			$notice = TimedNotice::get()->byID($id);
+			if ($notice && $notice->ID && $increase) {
+				$notice->StartTime = time() + ($increase * 60);
+				$notice->write();
+				return $increase;
+			}
+		}
+		return 0;
 	}
 }
