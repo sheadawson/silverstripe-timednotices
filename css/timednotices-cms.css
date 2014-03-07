@@ -8,3 +8,7 @@
 #timed-notices .message{
 	margin: 0px 8px 8px;
 }
+
+#timed-notices .notice-snoozer {
+	float: right;
+}

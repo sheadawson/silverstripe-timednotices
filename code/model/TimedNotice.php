@@ -163,4 +163,34 @@ class TimedNotice extends DataObject implements PermissionProvider {
 			'StartTime'
 		));
 	}
+
+	public static function add_notice($message, $end, $start = null, $type = 'good', $viewBy = null) {
+		if (!$start) {
+			$start = date('Y-m-d H:i:s');
+		} else {
+			$start = date('Y-m-d H:i:s', strtotime($start));
+		}
+		
+		$end = date('Y-m-d H:i:s', strtotime($end));
+
+		$notice = TimedNotice::create(array(
+			'Message'	=> $message,
+			'StartTime'		=> $start,
+			'EndTime'		=> $end,
+			'CanViewType'	=> 'LoggedInUsers',
+			'MessageType'	=> $type,
+		));
+		
+		if ($viewBy instanceof Group) {
+			$notice->CanViewType = 'OnlyTheseUsers';
+		}
+		
+		$notice->write();
+		
+		if ($viewBy instanceof Group) {
+			$notice->ViewerGroups()->add($viewBy);
+		}
+		
+		return $notice;
+	}
 }
