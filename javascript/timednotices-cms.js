@@ -38,7 +38,7 @@
 					container.show();
 					$(window).trigger('resize');		
 				}
-				
+
 				timeout = setTimeout(updateNotices, 30000);
 			});
 		}
@@ -84,6 +84,7 @@
 				
 				$.post('timednotice/snooze', {ID: notice.attr('data-id'), plus: $(this).attr('rel')}, function(data) {
 					notice.remove();
+					$(window).trigger('resize');
 				})
 				return false;
 			}
