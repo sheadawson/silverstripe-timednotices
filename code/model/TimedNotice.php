@@ -146,7 +146,7 @@ class TimedNotice extends DataObject implements PermissionProvider {
 
 
 	public function getStatusLabel(){
-		$now = date('Y-m-d H:i:s');
+		$now = SS_Datetime::now()->getValue();
 		if($this->StartTime > $now){
 			return 'Future';
 		}elseif($this->EndTime && $this->EndTime <= $now){
@@ -166,7 +166,7 @@ class TimedNotice extends DataObject implements PermissionProvider {
 
 	public static function add_notice($message, $end, $start = null, $type = 'good', $viewBy = null) {
 		if (!$start) {
-			$start = date('Y-m-d H:i:s');
+			$start = SS_Datetime::now()->getValue();
 		} else {
 			$start = date('Y-m-d H:i:s', strtotime($start));
 		}
