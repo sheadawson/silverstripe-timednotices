@@ -19,7 +19,7 @@ class TimedNoticeController extends Controller{
 	 * @return JSON
 	 **/
 	public function notices($request){
-		$now 		= date('Y-m-d H:i:s');
+		$now 		= SS_Datetime::now()->getValue();
 		$member 	= Member::currentUser();
 		$notices 	= TimedNotice::get()->where("
 			StartTime < '$now' AND 
