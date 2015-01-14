@@ -14,7 +14,7 @@
 	{
 		"composer/installers": "*",
 		"silverstripe/framework": "~3.1",
-		"silverstripe/timepickerfield": "dev-master"
+		"silverstripe/timepickerfield": "~1.0"
 	},
 	"extra": {
 		"installer-name": "timednotices"
