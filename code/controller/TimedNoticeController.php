@@ -51,9 +51,14 @@ class TimedNoticeController extends Controller{
 
 		if ($id) {
 			$notice = TimedNotice::get()->byID($id);
-			if ($notice && $notice->ID && $increase) {
-				$notice->StartTime = time() + ($increase * 60);
-				$notice->EndTime = strtotime($notice->EndTime) + ($increase * 60);
+			if ($notice && $notice->ID) {
+				if ($increase > 0) {
+					$notice->StartTime = time() + ($increase * 60);
+					$notice->EndTime = strtotime($notice->EndTime) + ($increase * 60);
+				} else {
+					$notice->EndTime = time() + $increase;
+				}
+				
 				$notice->write();
 				return $increase;
 			}
