@@ -27,7 +27,7 @@
 
                         var notice_time = $('<p>' + dateStr + '</p>')
                             .addClass('notice-time')
-						var snoozer = $('<div>Snooze for <a href="#" rel="15">15 mins</a>, <a href="#" rel="60">1 hour</a>, <a href="#" rel="1440">1 day</a></div>')
+						var snoozer = $('<div>Snooze for <a href="#" rel="15">15 mins</a>, <a href="#" rel="60">1 hour</a>, <a href="#" rel="1440">1 day</a>, <a href="#" rel="-1">done</a></div>')
 							.addClass('notice-snoozer')
 
                         entry.append(snoozer);
