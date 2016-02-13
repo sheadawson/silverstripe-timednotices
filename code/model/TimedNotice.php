@@ -85,9 +85,7 @@ class TimedNotice extends DataObject implements PermissionProvider
             )
         );
 
-        if (class_exists('DisplayLogicCriteria')) {
-            $viewerGroupsField->displayIf("CanViewType")->isEqualTo("OnlyTheseUsers");
-        }
+        $viewerGroupsField->displayIf("CanViewType")->isEqualTo("OnlyTheseUsers");
 
         $fields->addFieldToTab(
             'Root.Main',
