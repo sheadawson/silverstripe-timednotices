@@ -20,7 +20,7 @@ class TimedNotice extends DataObject implements PermissionProvider
     );
 
     private static $many_many = array(
-        'ViewerGroups'    => 'Group',
+        'ViewerGroups'   => 'Group',
     );
 
     private static $defaults = array(
@@ -59,7 +59,10 @@ class TimedNotice extends DataObject implements PermissionProvider
         $fields->removeFieldFromTab('Root', 'ViewerGroups');
 
         $viewersOptionsSource["LoggedInUsers"] = _t('TimedNotice.ACCESSLOGGEDIN', "Logged-in users");
-        $viewersOptionsSource["OnlyTheseUsers"] = _t('TimedNotice.ACCESSONLYTHESE', "Only these people (choose from list)");
+        $viewersOptionsSource["OnlyTheseUsers"] = _t(
+            'TimedNotice.ACCESSONLYTHESE',
+            "Only these people (choose from list)
+        ");
         $fields->addFieldToTab('Root.Main', $canViewTypeField = OptionsetField::create(
             "CanViewType",
             _t('TimedNotice.ACCESSHEADER', "Who should see this notice?"),
@@ -68,33 +71,50 @@ class TimedNotice extends DataObject implements PermissionProvider
 
         $groupsMap = Group::get()->map('ID', 'Breadcrumbs')->toArray();
         asort($groupsMap);
-        $fields->addFieldToTab('Root.Main', $viewerGroupsField = ListboxField::create("ViewerGroups", _t('TimedNotice.VIEWERGROUPS', "Only people in these groups"))
+        $fields->addFieldToTab(
+            'Root.Main',
+            $viewerGroupsField = ListboxField::create(
+                "ViewerGroups",
+                _t('TimedNotice.VIEWERGROUPS', "Only people in these groups")
+            )
             ->setMultiple(true)
             ->setSource($groupsMap)
             ->setAttribute(
                 'data-placeholder',
                 _t('TimedNotice.GroupPlaceholder', 'Click to select group')
-        ));
+            )
+        );
 
         if (class_exists('DisplayLogicCriteria')) {
             $viewerGroupsField->displayIf("CanViewType")->isEqualTo("OnlyTheseUsers");
         }
 
-        $fields->addFieldToTab('Root.Main', DropdownField::create(
-            'MessageType',
-            'Message Type',
-            ArrayLib::valuekey($this->config()->get('message_types'))
-        ), 'Message');
+        $fields->addFieldToTab(
+            'Root.Main',
+            DropdownField::create(
+                'MessageType',
+                'Message Type',
+                ArrayLib::valuekey($this->config()->get('message_types'))
+            ),
+            'Message'
+        );
 
         $fields->addFieldToTab(
             'Root.Main',
             ReadonlyField::create(
-                'TZNote', 'Note', sprintf(_t('TimedNotice.TZNote', 'Your dates and times should be based on the server timezone: %s'), date_default_timezone_get())),
+                'TZNote',
+                'Note',
+                sprintf(_t(
+                    'TimedNotice.TZNote',
+                    'Your dates and times should be based on the server timezone: %s'),
+                    date_default_timezone_get()
+                )
+            ),
             'StartTime'
         );
 
-        $start    = $fields->dataFieldByName('StartTime');
-        $end    = $fields->dataFieldByName('EndTime');
+        $start = $fields->dataFieldByName('StartTime');
+        $end   = $fields->dataFieldByName('EndTime');
 
         $start->getDateField()->setConfig('showcalendar', true);
         $end->getDateField()->setConfig('showcalendar', true);
@@ -153,7 +173,9 @@ class TimedNotice extends DataObject implements PermissionProvider
         return Permission::check('ADMIN') || Permission::check('TIMEDNOTICE_CREATE');
     }
 
-
+    /**
+     * @return string
+     */
     public function getStatusLabel()
     {
         $now = SS_Datetime::now()->getValue();
@@ -166,7 +188,9 @@ class TimedNotice extends DataObject implements PermissionProvider
         }
     }
 
-
+    /**
+     * @return RequiredFields
+     */
     public function getCMSValidator()
     {
         return RequiredFields::create(array(
