@@ -9,26 +9,26 @@ class TimedNotice extends DataObject implements PermissionProvider
 {
 
     private static $singular_name    = 'Timed Notice';
-    private static $plural_name        = 'Timed Notices';
-    
+    private static $plural_name      = 'Timed Notices';
+
     private static $db = array(
         'Message'        => 'Text',
         'MessageType'    => 'Varchar',
-        'StartTime'    => 'SS_DateTime',
+        'StartTime'      => 'SS_DateTime',
         'EndTime'        => 'SS_DateTime',
-        'CanViewType'    => "Enum('LoggedInUsers, OnlyTheseUsers', 'LoggedInUsers')"
+        'CanViewType'    => "Enum('LoggedInUsers, OnlyTheseUsers', 'LoggedInUsers')",
     );
 
     private static $many_many = array(
-        'ViewerGroups'    => 'Group'
+        'ViewerGroups'    => 'Group',
     );
 
     private static $defaults = array(
-        'CanViewType'    => 'LoggedInUsers'
+        'CanViewType'    => 'LoggedInUsers',
     );
 
     private static $summary_fields = array(
-        'StartTime'    => "Start Time",
+        'StartTime'      => "Start Time",
         'EndTime'        => "End Time",
         'StatusLabel'    => "Status",
         'MessageType'    => "Message Type",
@@ -36,19 +36,19 @@ class TimedNotice extends DataObject implements PermissionProvider
     );
 
     private static $searchable_fields = array(
-        'MessageType'
+        'MessageType',
     );
 
     private static $message_types = array(
         'good',
         'warning',
-        'bad'
+        'bad',
     );
 
     private static $status_options = array(
         'Current',
         'Future',
-        'Expired'
+        'Expired',
     );
 
 
@@ -79,7 +79,7 @@ class TimedNotice extends DataObject implements PermissionProvider
         if (class_exists('DisplayLogicCriteria')) {
             $viewerGroupsField->displayIf("CanViewType")->isEqualTo("OnlyTheseUsers");
         }
-        
+
         $fields->addFieldToTab('Root.Main', DropdownField::create(
             'MessageType',
             'Message Type',
@@ -95,7 +95,7 @@ class TimedNotice extends DataObject implements PermissionProvider
 
         $start    = $fields->dataFieldByName('StartTime');
         $end    = $fields->dataFieldByName('EndTime');
-        
+
         $start->getDateField()->setConfig('showcalendar', true);
         $end->getDateField()->setConfig('showcalendar', true);
 
@@ -111,7 +111,9 @@ class TimedNotice extends DataObject implements PermissionProvider
         return $fields;
     }
 
-
+    /**
+     * @return array
+     */
     public function providePermissions()
     {
         return array(
@@ -180,27 +182,27 @@ class TimedNotice extends DataObject implements PermissionProvider
         } else {
             $start = date('Y-m-d H:i:s', strtotime($start));
         }
-        
+
         $end = date('Y-m-d H:i:s', strtotime($end));
 
         $notice = TimedNotice::create(array(
-            'Message'    => $message,
-            'StartTime'        => $start,
+            'Message'        => $message,
+            'StartTime'      => $start,
             'EndTime'        => $end,
             'CanViewType'    => 'LoggedInUsers',
             'MessageType'    => $type,
         ));
-        
+
         if ($viewBy instanceof Group) {
             $notice->CanViewType = 'OnlyTheseUsers';
         }
-        
+
         $notice->write();
-        
+
         if ($viewBy instanceof Group) {
             $notice->ViewerGroups()->add($viewBy);
         }
-        
+
         return $notice;
     }
 }
