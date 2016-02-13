@@ -7,16 +7,17 @@
  **/
 class TimedNoticeController extends Controller
 {
-
+    /**
+     * @var array
+     */
     private static $allowed_actions = array(
         'notices',
         'snooze',
-        
     );
-
 
     /**
      * Gets any notices relevant to the present time and current users
+     *
      * @return JSON
      **/
     public function notices($request)
@@ -24,10 +25,9 @@ class TimedNoticeController extends Controller
         $now        = SS_Datetime::now()->getValue();
         $member    = Member::currentUser();
         $notices    = TimedNotice::get()->where("
-			StartTime < '$now' AND 
-			(EndTime > '$now' OR EndTime IS NULL) 
-		");
-
+            StartTime < '$now' AND
+            (EndTime > '$now' OR EndTime IS NULL)
+        ");
 
         if ($notices->count()) {
             $notices = ArrayList::create($notices->toArray());
@@ -42,13 +42,13 @@ class TimedNoticeController extends Controller
 
         return Convert::array2json($notices->toNestedArray());
     }
-    
+
     public function snooze()
     {
         if (!Permission::check('TIMEDNOTICE_EDIT')) {
             return;
         }
-        
+
         $id = (int) $this->request->postVar('ID');
         $increase = (int) $this->request->postVar('plus');
 
@@ -61,11 +61,12 @@ class TimedNoticeController extends Controller
                 } else {
                     $notice->EndTime = time() + $increase;
                 }
-                
+
                 $notice->write();
                 return $increase;
             }
         }
+
         return 0;
     }
 }
