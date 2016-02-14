@@ -20,27 +20,9 @@ class TimedNoticeController extends Controller
      *
      * @return JSON
      **/
-    public function notices($request)
+    public function notices()
     {
-        $now        = SS_Datetime::now()->getValue();
-        $member    = Member::currentUser();
-        $notices    = TimedNotice::get()->where("
-            StartTime < '$now' AND
-            (EndTime > '$now' OR EndTime IS NULL)
-        ");
-
-        if ($notices->count()) {
-            $notices = ArrayList::create($notices->toArray());
-            foreach ($notices as $notice) {
-                if ($notice->CanViewType == 'OnlyTheseUsers') {
-                    if ($member && !$member->inGroups($notice->ViewerGroups())) {
-                        $notices->remove($notice);
-                    }
-                }
-            }
-        }
-
-        return Convert::array2json($notices->toNestedArray());
+        return Convert::array2json(TimedNotice::getNotices()->toNestedArray());
     }
 
     public function snooze()
@@ -63,6 +45,7 @@ class TimedNoticeController extends Controller
                 }
 
                 $notice->write();
+
                 return $increase;
             }
         }
