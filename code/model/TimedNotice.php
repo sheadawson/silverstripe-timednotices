@@ -58,16 +58,22 @@ class TimedNotice extends DataObject implements PermissionProvider
 
         $fields->removeFieldFromTab('Root', 'ViewerGroups');
 
-        $viewersOptionsSource["LoggedInUsers"] = _t('TimedNotice.ACCESSLOGGEDIN', "Logged-in users");
-        $viewersOptionsSource["OnlyTheseUsers"] = _t(
+        $viewersOptionsSource['LoggedInUsers'] = _t(
+            'TimedNotice.ACCESSLOGGEDIN',
+            'Logged-in users'
+        );
+        $viewersOptionsSource['OnlyTheseUsers'] = _t(
             'TimedNotice.ACCESSONLYTHESE',
-            "Only these people (choose from list)
-        ");
-        $fields->addFieldToTab('Root.Main', $canViewTypeField = OptionsetField::create(
-            "CanViewType",
-            _t('TimedNotice.ACCESSHEADER', "Who should see this notice?"),
-            $viewersOptionsSource
-        ));
+            'Only these people (choose from list)'
+        );
+        $fields->addFieldToTab(
+            'Root.Main',
+            $canViewTypeField = OptionsetField::create(
+                "CanViewType",
+                _t('TimedNotice.ACCESSHEADER', "Who should see this notice?"),
+                $viewersOptionsSource
+            )
+        );
 
         $groupsMap = Group::get()->map('ID', 'Breadcrumbs')->toArray();
         asort($groupsMap);
