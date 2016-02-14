@@ -7,34 +7,31 @@
  **/
 class TimedNoticeAdmin extends ModelAdmin
 {
-
+    /**
+     * @var array
+     */
     private static $managed_models = array(
         'TimedNotice'
     );
-    
+
     private static $url_segment = 'time-notices';
-    
+
     private static $menu_title = 'Timed Notices';
 
     private static $menu_icon = 'timednotices/images/bell.png';
 
     public $showImportForm = false;
-    
-    public function init()
-    {
-        parent::init();
-    }
-
 
     /**
      * Update the SearchForm to use dropdown fields for MessageType/Status filters
+     *
      * @return Form
      **/
     public function SearchForm()
     {
-        $form    = parent::SearchForm();
+        $form   = parent::SearchForm();
         $fields = $form->Fields();
-        $q        = $this->getRequest()->requestVar('q');
+        $q      = $this->getRequest()->requestVar('q');
 
         $fields->removeByName('q[MessageType]');
 
@@ -59,9 +56,9 @@ class TimedNoticeAdmin extends ModelAdmin
         return $form;
     }
 
-
     /**
      * Custom filtering on "Status"
+     *
      * @return Form
      **/
     public function getList()
@@ -78,9 +75,9 @@ class TimedNoticeAdmin extends ModelAdmin
                     return $list->where("EndTime < $now");
                 } elseif ($status == 'Current') {
                     return $list->where("
-						StartTime < '$now' AND 
-						(EndTime > '$now' OR EndTime IS NULL) 
-					");
+                        StartTime < '$now' AND
+                        (EndTime > '$now' OR EndTime IS NULL)
+                    ");
                 }
             }
         }
