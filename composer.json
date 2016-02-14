@@ -2,7 +2,7 @@
 	"name": "sheadawson/silverstripe-timednotices",
 	"description": "Display notice banners in the cms interface over a given time period. Good for notifying cms users of scheduled updates or downtime etc.",
 	"type": "silverstripe-module",
-	"keywords": ["silverstripe", "notification"],
+	"keywords": ["silverstripe", "notification", "notifications", "alert", "alertbar", "notices", "notice", "message", "messages"],
 	"homepage": "http://github.com/sheadawson/silverstripe-timednotices",
 	"authors": [
 	{
