@@ -74,7 +74,7 @@ class TimedNoticeAdmin extends ModelAdmin
                 $now = date('Y-m-d H:i:s');
                 if ($status == 'Future') {
                     return $list->where("StartTime > '$now'");
-                } elseif ($status == 'Past') {
+                } elseif ($status == 'Expired') {
                     return $list->where("EndTime < $now");
                 } elseif ($status == 'Current') {
                     return $list->where("
