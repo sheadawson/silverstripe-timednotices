@@ -203,7 +203,7 @@ class TimedNotice extends DataObject implements PermissionProvider
         ));
     }
 
-    public static function add_notice($message, $end, $start = null, $type = 'good', $viewBy = null)
+    public static function add_notice($message, $context, $end, $start = null, $type = 'good', $viewBy = null)
     {
         if (!$start) {
             $start = SS_Datetime::now()->getValue();
@@ -215,6 +215,7 @@ class TimedNotice extends DataObject implements PermissionProvider
 
         $notice = TimedNotice::create(array(
             'Message'        => $message,
+            'Context'        => $context,
             'StartTime'      => $start,
             'EndTime'        => $end,
             'CanViewType'    => 'LoggedInUsers',
