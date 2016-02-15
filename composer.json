@@ -14,12 +14,10 @@
 	{
 		"composer/installers": "*",
 		"silverstripe/framework": "~3.1",
-		"silverstripe/timepickerfield": "~1.0"
+		"silverstripe/timepickerfield": "~1.0",
+		"unclecheese/display-logic": "*"
 	},
 	"extra": {
 		"installer-name": "timednotices"
-	},
-	"suggest": {
-        "unclecheese/display-logic": "Improves usability in TimedNotice edit form"
-    }
+	}
 }
