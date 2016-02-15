@@ -12,11 +12,12 @@ class TimedNotice extends DataObject implements PermissionProvider
     private static $plural_name      = 'Timed Notices';
 
     private static $db = array(
+        'Context'        => "Enum('Website,CMS','CMS')",
         'Message'        => 'Text',
         'MessageType'    => 'Varchar',
         'StartTime'      => 'SS_DateTime',
         'EndTime'        => 'SS_DateTime',
-        'CanViewType'    => "Enum('LoggedInUsers, OnlyTheseUsers', 'LoggedInUsers')",
+        'CanViewType'    => "Enum('Anyone,LoggedInUsers,OnlyTheseUsers', 'LoggedInUsers')",
     );
 
     private static $many_many = array(
@@ -58,6 +59,11 @@ class TimedNotice extends DataObject implements PermissionProvider
 
         $fields->removeFieldFromTab('Root', 'ViewerGroups');
 
+        // prepare options for the target groups
+        $viewersOptionsSource['Anyone'] = _t(
+            'TimedNotice.ANYONE',
+            'Anyone'
+        );
         $viewersOptionsSource['LoggedInUsers'] = _t(
             'TimedNotice.ACCESSLOGGEDIN',
             'Logged-in users'
@@ -178,6 +184,60 @@ class TimedNotice extends DataObject implements PermissionProvider
     }
 
     /**
+     * Gets any notices relevant to the present time, context and current users
+     *
+     * @return ArrayList
+     **/
+    public static function getNotices()
+    {
+        // analyse the context this message gets requested
+        $context = self::getContext();
+
+        // prepare and filter the possible result
+        $now        = SS_Datetime::now()->getValue();
+        $member     = Member::currentUser();
+        $notices    = TimedNotice::get()->where("
+            Context = '{$context}' AND
+            StartTime < '{$now}' AND
+            (EndTime > '{$now}' OR EndTime IS NULL)
+        ");
+
+        // if there are notices verify if those are allowed for this group
+        if ($notices->count()) {
+            // turn the DataList into an ArrayList to make it editable.
+            $notices = ArrayList::create($notices->toArray());
+
+            foreach ($notices as $notice) {
+                if ($notice->CanViewType == 'OnlyTheseUsers') {
+                    if ($member && !$member->inGroups($notice->ViewerGroups())) {
+                        $notices->remove($notice);
+                    }
+                }
+            }
+        }
+
+        return $notices;
+    }
+
+    /**
+     * Analysis the context and returns the context information as string
+     *
+     * @return string
+     */
+    public static function getContext()
+    {
+        // default assumption is website.
+        $context = 'Website';
+
+        // if the notice is delivered via the TimedNoticeController it is the CMS
+        if (get_class(Controller::curr()) == 'TimedNoticeController') {
+            $context = 'CMS';
+        }
+
+        return $context;
+    }
+
+    /**
      * @return string
      */
     public function getStatusLabel()
@@ -198,6 +258,7 @@ class TimedNotice extends DataObject implements PermissionProvider
     public function getCMSValidator()
     {
         return RequiredFields::create(array(
+            'Context',
             'Message',
             'StartTime'
         ));
@@ -221,6 +282,10 @@ class TimedNotice extends DataObject implements PermissionProvider
             'CanViewType'    => 'LoggedInUsers',
             'MessageType'    => $type,
         ));
+
+        if ($viewBy == 'Anyone') {
+            $notice->CanViewType = 'Anyone';
+        }
 
         if ($viewBy instanceof Group) {
             $notice->CanViewType = 'OnlyTheseUsers';
