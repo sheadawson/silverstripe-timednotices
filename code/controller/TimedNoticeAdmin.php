@@ -14,7 +14,7 @@ class TimedNoticeAdmin extends ModelAdmin
         'TimedNotice'
     );
 
-    private static $url_segment = 'time-notices';
+    private static $url_segment = 'timed-notices';
 
     private static $menu_title = 'Timed Notices';
 
