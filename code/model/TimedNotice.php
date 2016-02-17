@@ -188,7 +188,7 @@ class TimedNotice extends DataObject implements PermissionProvider
      *
      * @return ArrayList
      **/
-    public static function getNotices()
+    public static function get_notices()
     {
         // analyse the context this message gets requested
         $context = self::getContext();
@@ -224,7 +224,7 @@ class TimedNotice extends DataObject implements PermissionProvider
      *
      * @return string
      */
-    public static function getContext()
+    public static function get_context()
     {
         // default assumption is website.
         $context = 'Website';

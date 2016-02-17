@@ -27,10 +27,10 @@ class TimedNoticeController extends Controller
         // We want to deliver notices only if a user is logged in.
         // This way we ensure, that a potential attacker can't read notices for CMS users.
         if (Member::currentUser()) {
-            $notices = TimedNotice::getNotices()->toNestedArray();
+            $notices = TimedNotice::get_notices()->toNestedArray();
         }
 
-        return Convert::array2json($notices->toNestedArray());
+        return Convert::array2json($notices);
     }
 
     public function snooze($request)

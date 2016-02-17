@@ -7,9 +7,6 @@ After:
 Director:
   rules:
    'timednotice//$Action/$ID/$OtherID': 'TimedNoticeController'
-Page:
-  extensions:
-    - TimedNoticedPageExtension
 LeftAndMain:
   extra_requirements_javascript:
     - 'timednotices/javascript/timednotices-cms.js'
