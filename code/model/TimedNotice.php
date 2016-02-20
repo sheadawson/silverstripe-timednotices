@@ -191,7 +191,7 @@ class TimedNotice extends DataObject implements PermissionProvider
     public static function get_notices()
     {
         // analyse the context this message gets requested
-        $context = self::getContext();
+        $context = self::get_context();
 
         // prepare and filter the possible result
         $now        = SS_Datetime::now()->getValue();
