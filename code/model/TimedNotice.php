@@ -7,10 +7,19 @@
  **/
 class TimedNotice extends DataObject implements PermissionProvider
 {
-
+    /**
+     * @var string
+     */
     private static $singular_name    = 'Timed Notice';
+
+    /**
+     * @var string
+     */
     private static $plural_name      = 'Timed Notices';
 
+    /**
+     * @var array
+     */
     private static $db = array(
         'Context'        => "Enum('Website,CMS','CMS')",
         'Message'        => 'Text',
@@ -20,14 +29,23 @@ class TimedNotice extends DataObject implements PermissionProvider
         'CanViewType'    => "Enum('Anyone,LoggedInUsers,OnlyTheseUsers', 'LoggedInUsers')",
     );
 
+    /**
+     * @var array
+     */
     private static $many_many = array(
         'ViewerGroups'   => 'Group',
     );
 
+    /**
+     * @var array
+     */
     private static $defaults = array(
         'CanViewType'    => 'LoggedInUsers',
     );
 
+    /**
+     * @var array
+     */
     private static $summary_fields = array(
         'StartTime'      => "Start Time",
         'EndTime'        => "End Time",
@@ -36,16 +54,25 @@ class TimedNotice extends DataObject implements PermissionProvider
         'Message'        => "Message",
     );
 
+    /**
+     * @var array
+     */
     private static $searchable_fields = array(
         'MessageType',
     );
 
+    /**
+     * @var array
+     */
     private static $message_types = array(
         'good',
         'warning',
         'bad',
     );
 
+    /**
+     * @var array
+     */
     private static $status_options = array(
         'Current',
         'Future',
@@ -186,17 +213,20 @@ class TimedNotice extends DataObject implements PermissionProvider
     /**
      * Gets any notices relevant to the present time, context and current users
      *
+     * @param string $context (default: CMS)
      * @return ArrayList
      **/
-    public static function get_notices()
+    public static function get_notices($context = null)
     {
-        // analyse the context this message gets requested
-        $context = self::get_context();
+        // fallback to the CMS as the context - this is required to be consistent with the original behaviour.
+        if ($context == null) {
+            $context = 'CMS';
+        }
 
         // prepare and filter the possible result
-        $now        = SS_Datetime::now()->getValue();
-        $member     = Member::currentUser();
-        $notices    = TimedNotice::get()->where("
+        $now     = SS_Datetime::now()->getValue();
+        $member  = Member::currentUser();
+        $notices = TimedNotice::get()->where("
             Context = '{$context}' AND
             StartTime < '{$now}' AND
             (EndTime > '{$now}' OR EndTime IS NULL)
@@ -217,24 +247,6 @@ class TimedNotice extends DataObject implements PermissionProvider
         }
 
         return $notices;
-    }
-
-    /**
-     * Analysis the context and returns the context information as string
-     *
-     * @return string
-     */
-    public static function get_context()
-    {
-        // default assumption is website.
-        $context = 'Website';
-
-        // if the notice is delivered via the TimedNoticeController it is the CMS
-        if (get_class(Controller::curr()) == 'TimedNoticeController') {
-            $context = 'CMS';
-        }
-
-        return $context;
     }
 
     /**

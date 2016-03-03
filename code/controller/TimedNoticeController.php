@@ -1,6 +1,7 @@
 <?php
 /**
- * TimedNoticeController
+ * TimedNoticeController is used to supply the notices to the administration section
+ * as well as providing the snooze functionality for the website notices.
  *
  * @package timednotices
  * @author shea@silverstripe.com.au
@@ -18,16 +19,17 @@ class TimedNoticeController extends Controller
     /**
      * Gets any notices relevant to the present time and current users
      *
+     * @param string $context (default: CMS)
      * @return JSON
      **/
-    public function notices()
+    public function notices($context = null)
     {
         $notices = array();
 
         // We want to deliver notices only if a user is logged in.
         // This way we ensure, that a potential attacker can't read notices for CMS users.
         if (Member::currentUser()) {
-            $notices = TimedNotice::get_notices()->toNestedArray();
+            $notices = TimedNotice::get_notices($context)->toNestedArray();
         }
 
         return Convert::array2json($notices);

@@ -11,7 +11,7 @@ class TimedNoticePageExtension extends DataExtension
     {
         // render a list of notications for this
         return $this->owner
-            ->customise(array('Notices' => TimedNotice::get_notices()))
+            ->customise(array('Notices' => TimedNotice::get_notices('Website')))
             ->renderWith('NoticesList');
     }
 }
