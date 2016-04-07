@@ -26,6 +26,11 @@ class TimedNoticeController extends Controller
     {
         $notices = array();
 
+        // fallback to the CMS as the context - this is required to be consistent with the original behaviour.
+        if ($context == null || $context instanceof SS_HTTPRequest) {
+            $context = 'CMS';
+        }
+
         // We want to deliver notices only if a user is logged in.
         // This way we ensure, that a potential attacker can't read notices for CMS users.
         if (Member::currentUser()) {
