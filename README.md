@@ -37,7 +37,7 @@ If you are intending to use the notices on your website you have to take care of
     {
         // render a list of notications for this
         return $this
-            ->customise(array('Notices' => TimedNotice::get_notices()))
+            ->customise(array('Notices' => TimedNotice::get_notices('Website')))
             ->renderWith('NoticesList');
     }
 
