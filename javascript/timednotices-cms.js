@@ -36,6 +36,8 @@
 					
 					});
 					container.show();
+					$('.has-panel .cms-content-header-info').css('top', container.outerHeight());
+					$('.better-buttons-utils').css('top', container.outerHeight() + 5);
 					$(window).trigger('resize');		
 				}
 
@@ -84,6 +86,8 @@
 				
 				$.post('timednotice/snooze', {ID: notice.attr('data-id'), plus: $(this).attr('rel')}, function(data) {
 					notice.remove();
+					$('.has-panel .cms-content-header-info').css('top', container.outerHeight());
+					$('.better-buttons-utils').css('top', container.outerHeight() + 5);
 					$(window).trigger('resize');
 				})
 				return false;
