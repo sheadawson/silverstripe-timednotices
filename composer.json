@@ -20,6 +20,7 @@
 		"installer-name": "timednotices"
 	},
 	"suggest": {
-        "unclecheese/display-logic": "Improves usibility in TimedNotice edit form"
+        "unclecheese/display-logic": "Improves usibility in TimedNotice edit form",
+        "unclecheese/display-logic": "*"
     }
 }
