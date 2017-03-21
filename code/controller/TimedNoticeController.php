@@ -1,6 +1,7 @@
 <?php
 /**
- * TimedNoticeController
+ * TimedNoticeController is used to supply the notices to the administration section
+ * as well as providing the snooze functionality for the website notices.
  *
  * @package timednotices
  * @author shea@silverstripe.com.au
@@ -12,45 +13,37 @@ class TimedNoticeController extends Controller
      */
     private static $allowed_actions = array(
         'notices',
-        'snooze',
+        'snooze' => 'TIMEDNOTICE_EDIT',
     );
 
     /**
      * Gets any notices relevant to the present time and current users
      *
+     * @param string $context (default: CMS)
      * @return JSON
      **/
-    public function notices($request)
+    public function notices($context = null)
     {
-        $now        = SS_Datetime::now()->getValue();
-        $member    = Member::currentUser();
-        $notices    = TimedNotice::get()->where("
-            StartTime < '$now' AND
-            (EndTime > '$now' OR EndTime IS NULL)
-        ");
+        $notices = array();
 
-        if ($notices->count()) {
-            $notices = ArrayList::create($notices->toArray());
-            foreach ($notices as $notice) {
-                if ($notice->CanViewType == 'OnlyTheseUsers') {
-                    if ($member && !$member->inGroups($notice->ViewerGroups())) {
-                        $notices->remove($notice);
-                    }
-                }
-            }
+        // fallback to the CMS as the context - this is required to be consistent with the original behaviour.
+        if ($context == null || $context instanceof SS_HTTPRequest) {
+            $context = 'CMS';
         }
 
-        return Convert::array2json($notices->toNestedArray());
+        // We want to deliver notices only if a user is logged in.
+        // This way we ensure, that a potential attacker can't read notices for CMS users.
+        if (Member::currentUser()) {
+            $notices = TimedNotice::get_notices($context)->toNestedArray();
+        }
+
+        return Convert::array2json($notices);
     }
 
-    public function snooze()
+    public function snooze($request)
     {
-        if (!Permission::check('TIMEDNOTICE_EDIT')) {
-            return;
-        }
-
-        $id = (int) $this->request->postVar('ID');
-        $increase = (int) $this->request->postVar('plus');
+        $id = (int) $request->postVar('ID');
+        $increase = (int) $request->postVar('plus');
 
         if ($id) {
             $notice = TimedNotice::get()->byID($id);
@@ -63,6 +56,7 @@ class TimedNoticeController extends Controller
                 }
 
                 $notice->write();
+
                 return $increase;
             }
         }

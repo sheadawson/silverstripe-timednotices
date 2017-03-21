@@ -7,26 +7,45 @@
  **/
 class TimedNotice extends DataObject implements PermissionProvider
 {
-
+    /**
+     * @var string
+     */
     private static $singular_name    = 'Timed Notice';
+
+    /**
+     * @var string
+     */
     private static $plural_name      = 'Timed Notices';
 
+    /**
+     * @var array
+     */
     private static $db = array(
+        'Context'        => "Enum('Website,CMS','CMS')",
         'Message'        => 'Text',
         'MessageType'    => 'Varchar',
         'StartTime'      => 'SS_DateTime',
         'EndTime'        => 'SS_DateTime',
-        'CanViewType'    => "Enum('LoggedInUsers, OnlyTheseUsers', 'LoggedInUsers')",
+        'CanViewType'    => "Enum('Anyone,LoggedInUsers,OnlyTheseUsers', 'LoggedInUsers')",
     );
 
+    /**
+     * @var array
+     */
     private static $many_many = array(
         'ViewerGroups'   => 'Group',
     );
 
+    /**
+     * @var array
+     */
     private static $defaults = array(
         'CanViewType'    => 'LoggedInUsers',
     );
 
+    /**
+     * @var array
+     */
     private static $summary_fields = array(
         'StartTime'      => "Start Time",
         'EndTime'        => "End Time",
@@ -35,16 +54,25 @@ class TimedNotice extends DataObject implements PermissionProvider
         'Message'        => "Message",
     );
 
+    /**
+     * @var array
+     */
     private static $searchable_fields = array(
         'MessageType',
     );
 
+    /**
+     * @var array
+     */
     private static $message_types = array(
         'good',
         'warning',
         'bad',
     );
 
+    /**
+     * @var array
+     */
     private static $status_options = array(
         'Current',
         'Future',
@@ -58,6 +86,11 @@ class TimedNotice extends DataObject implements PermissionProvider
 
         $fields->removeFieldFromTab('Root', 'ViewerGroups');
 
+        // prepare options for the target groups
+        $viewersOptionsSource['Anyone'] = _t(
+            'TimedNotice.ANYONE',
+            'Anyone'
+        );
         $viewersOptionsSource['LoggedInUsers'] = _t(
             'TimedNotice.ACCESSLOGGEDIN',
             'Logged-in users'
@@ -178,6 +211,45 @@ class TimedNotice extends DataObject implements PermissionProvider
     }
 
     /**
+     * Gets any notices relevant to the present time, context and current users
+     *
+     * @param string $context (default: CMS)
+     * @return ArrayList
+     **/
+    public static function get_notices($context = null)
+    {
+        // fallback to the CMS as the context - this is required to be consistent with the original behaviour.
+        if ($context == null) {
+            $context = 'CMS';
+        }
+
+        // prepare and filter the possible result
+        $now     = SS_Datetime::now()->getValue();
+        $member  = Member::currentUser();
+        $notices = TimedNotice::get()->where("
+            Context = '{$context}' AND
+            StartTime < '{$now}' AND
+            (EndTime > '{$now}' OR EndTime IS NULL)
+        ");
+
+        // if there are notices verify if those are allowed for this group
+        if ($notices->count()) {
+            // turn the DataList into an ArrayList to make it editable.
+            $notices = ArrayList::create($notices->toArray());
+
+            foreach ($notices as $notice) {
+                if ($notice->CanViewType == 'OnlyTheseUsers') {
+                    if ($member && !$member->inGroups($notice->ViewerGroups())) {
+                        $notices->remove($notice);
+                    }
+                }
+            }
+        }
+
+        return $notices;
+    }
+
+    /**
      * @return string
      */
     public function getStatusLabel()
@@ -198,12 +270,13 @@ class TimedNotice extends DataObject implements PermissionProvider
     public function getCMSValidator()
     {
         return RequiredFields::create(array(
+            'Context',
             'Message',
             'StartTime'
         ));
     }
 
-    public static function add_notice($message, $end, $start = null, $type = 'good', $viewBy = null)
+    public static function add_notice($message, $context, $end, $start = null, $type = 'good', $viewBy = null)
     {
         if (!$start) {
             $start = SS_Datetime::now()->getValue();
@@ -215,11 +288,16 @@ class TimedNotice extends DataObject implements PermissionProvider
 
         $notice = TimedNotice::create(array(
             'Message'        => $message,
+            'Context'        => $context,
             'StartTime'      => $start,
             'EndTime'        => $end,
             'CanViewType'    => 'LoggedInUsers',
             'MessageType'    => $type,
         ));
+
+        if ($viewBy == 'Anyone') {
+            $notice->CanViewType = 'Anyone';
+        }
 
         if ($viewBy instanceof Group) {
             $notice->CanViewType = 'OnlyTheseUsers';
