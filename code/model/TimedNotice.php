@@ -1,4 +1,21 @@
 <?php
+
+namespace MBIE\TimedNotice;
+
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\ListboxField;
+use SilverStripe\Forms\OptionsetField;
+use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Forms\RequiredFields;
+use SilverStripe\Forms\TimeField;
+use SilverStripe\ORM\ArrayLib;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\Security\Group;
+use SilverStripe\Security\PermissionProvider;
+use SilverStripe\Security\Permission;
+use UncleCheese\DisplayLogic\Extensions\DisplayLogic;
+
 /**
  * TimedNotice
  *
@@ -8,50 +25,85 @@
 class TimedNotice extends DataObject implements PermissionProvider
 {
 
-    private static $singular_name    = 'Timed Notice';
-    private static $plural_name      = 'Timed Notices';
+    /**
+     * @var string
+     */
+    private static $singular_name = 'Timed Notice';
 
-    private static $db = array(
+    /**
+     * @var string
+     */
+    private static $plural_name = 'Timed Notices';
+
+    /**
+     * @var array
+     */
+    private static $db = [
         'Message'        => 'Text',
         'MessageType'    => 'Varchar',
-        'StartTime'      => 'SS_DateTime',
-        'EndTime'        => 'SS_DateTime',
-        'CanViewType'    => "Enum('LoggedInUsers, OnlyTheseUsers', 'LoggedInUsers')",
-    );
+        'StartTime'      => 'Datetime',
+        'EndTime'        => 'Datetime',
+        'CanViewType'    => 'Enum("LoggedInUsers, OnlyTheseUsers, LoggedInUsers")',
+    ];
 
-    private static $many_many = array(
-        'ViewerGroups'   => 'Group',
-    );
+    /**
+     * @var string
+     */
+    private static $table_name = "TimedNotice";
 
-    private static $defaults = array(
+    /**
+     * @var array
+     */
+    private static $many_many = [
+        'ViewerGroups'   => Group::class,
+    ];
+
+    /**
+     * @var array
+     */
+    private static $defaults = [
         'CanViewType'    => 'LoggedInUsers',
-    );
+    ];
 
-    private static $summary_fields = array(
+    /**
+     * @var array
+     */
+    private static $summary_fields = [
         'StartTime'      => "Start Time",
         'EndTime'        => "End Time",
         'StatusLabel'    => "Status",
         'MessageType'    => "Message Type",
         'Message'        => "Message",
-    );
+    ];
 
-    private static $searchable_fields = array(
+    /**
+     * @var array
+     */
+    private static $searchable_fields = [
         'MessageType',
-    );
+    ];
 
-    private static $message_types = array(
+    /**
+     * @var array
+     */
+    private static $message_types = [
         'good',
         'warning',
         'bad',
-    );
+    ];
 
-    private static $status_options = array(
+    /**
+     * @var array
+     */
+    private static $status_options = [
         'Current',
         'Future',
         'Expired',
-    );
+    ];
 
-
+    /**
+     * @return FieldList $fields
+     */
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -62,10 +114,12 @@ class TimedNotice extends DataObject implements PermissionProvider
             'TimedNotice.ACCESSLOGGEDIN',
             'Logged-in users'
         );
+
         $viewersOptionsSource['OnlyTheseUsers'] = _t(
             'TimedNotice.ACCESSONLYTHESE',
             'Only these people (choose from list)'
         );
+
         $fields->addFieldToTab(
             'Root.Main',
             $canViewTypeField = OptionsetField::create(
@@ -77,13 +131,14 @@ class TimedNotice extends DataObject implements PermissionProvider
 
         $groupsMap = Group::get()->map('ID', 'Breadcrumbs')->toArray();
         asort($groupsMap);
+
         $fields->addFieldToTab(
             'Root.Main',
             $viewerGroupsField = ListboxField::create(
                 "ViewerGroups",
                 _t('TimedNotice.VIEWERGROUPS', "Only people in these groups")
             )
-            ->setMultiple(true)
+            // ->setMultiple(true)
             ->setSource($groupsMap)
             ->setAttribute(
                 'data-placeholder',
@@ -120,17 +175,21 @@ class TimedNotice extends DataObject implements PermissionProvider
         $start = $fields->dataFieldByName('StartTime');
         $end   = $fields->dataFieldByName('EndTime');
 
-        $start->getDateField()->setConfig('showcalendar', true);
-        $end->getDateField()->setConfig('showcalendar', true);
+        /**
+         * ToDo: check whether these are needed or not
+         */
+        // $start->getDateField()->setConfig('showcalendar', true);
+        // $end->getDateField()->setConfig('showcalendar', true);
 
-        $start->setTimeField(
-            TimePickerField::create('StartTime[time]', '')
-                ->addExtraClass('fieldgroup-field')
-        );
-        $end->setTimeField(
-            TimePickerField::create('EndTime[time]', '')
-                ->addExtraClass('fieldgroup-field')
-        );
+        // $start->setTimeField(
+        //     TimeField::create('StartTime[time]', '')
+        //         ->addExtraClass('fieldgroup-field')
+        // );
+
+        // $end->setTimeField(
+        //     TimeField::create('EndTime[time]', '')
+        //         ->addExtraClass('fieldgroup-field')
+        // );
 
         return $fields;
     }
@@ -140,39 +199,50 @@ class TimedNotice extends DataObject implements PermissionProvider
      */
     public function providePermissions()
     {
-        return array(
-            'TIMEDNOTICE_EDIT' => array(
+        return [
+            'TIMEDNOTICE_EDIT' => [
                 'name' => 'Edit a Timed Notice',
                 'category' => 'Timed Notices',
-            ),
-            'TIMEDNOTICE_DELETE' => array(
+            ],
+            'TIMEDNOTICE_DELETE' => [
                 'name' => 'Delete a Timed Notice',
                 'category' => 'Timed Notices',
-            ),
-            'TIMEDNOTICE_CREATE' => array(
+            ],
+            'TIMEDNOTICE_CREATE' => [
                 'name' => 'Create a Timed Notice',
                 'category' => 'Timed Notices'
-            )
-        );
+           ]
+        ];
     }
 
-
+    /**
+     * @return boolean
+     */
     public function canView($member = null)
     {
         return true;
     }
 
+    /**
+     * @return boolean
+     */
     public function canEdit($member = null)
     {
         return Permission::check('ADMIN') || Permission::check('TIMEDNOTICE_EDIT');
     }
 
+    /**
+     * @return boolean
+     */
     public function canDelete($member = null)
     {
         return Permission::check('ADMIN') || Permission::check('TIMEDNOTICE_DELETE');
     }
 
-    public function canCreate($member = null)
+    /**
+     * @return boolean
+     */
+    public function canCreate($member = null, $content = [])
     {
         return Permission::check('ADMIN') || Permission::check('TIMEDNOTICE_CREATE');
     }
@@ -182,7 +252,7 @@ class TimedNotice extends DataObject implements PermissionProvider
      */
     public function getStatusLabel()
     {
-        $now = SS_Datetime::now()->getValue();
+        $now = DBDatetime::now()->getValue();
         if ($this->StartTime > $now) {
             return 'Future';
         } elseif ($this->EndTime && $this->EndTime <= $now) {
@@ -197,29 +267,36 @@ class TimedNotice extends DataObject implements PermissionProvider
      */
     public function getCMSValidator()
     {
-        return RequiredFields::create(array(
-            'Message',
-            'StartTime'
-        ));
+        return RequiredFields::create(
+            [
+                'Message',
+                'StartTime'
+            ]
+        );
     }
 
+    /**
+     * @return TimedNotice $notice
+     */
     public static function add_notice($message, $end, $start = null, $type = 'good', $viewBy = null)
     {
         if (!$start) {
-            $start = SS_Datetime::now()->getValue();
+            $start = DBDatetime::now()->getValue();
         } else {
             $start = date('Y-m-d H:i:s', strtotime($start));
         }
 
         $end = date('Y-m-d H:i:s', strtotime($end));
 
-        $notice = TimedNotice::create(array(
-            'Message'        => $message,
-            'StartTime'      => $start,
-            'EndTime'        => $end,
-            'CanViewType'    => 'LoggedInUsers',
-            'MessageType'    => $type,
-        ));
+        $notice = TimedNotice::create(
+            [
+                'Message'        => $message,
+                'StartTime'      => $start,
+                'EndTime'        => $end,
+                'CanViewType'    => 'LoggedInUsers',
+                'MessageType'    => $type,
+            ]
+        );
 
         if ($viewBy instanceof Group) {
             $notice->CanViewType = 'OnlyTheseUsers';
