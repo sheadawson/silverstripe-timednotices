@@ -7,7 +7,5 @@ SilverStripe\Control\Director:
    'timednotice//$Action/$ID/$OtherID': MBIE\TimedNotice\TimedNoticeController
 
 SilverStripe\Admin\LeftAndMain:
-  extra_requirements_javascript:
-    - 'silverstripe-timednotices/javascript/timednotices-cms.js'
-  extra_requirements_css:
-    - 'silverstripe-timednotices/css/timednotices-cms.css'
+  extra_requirements_javascript: 'silverstripe-timednotices/javascript/timednotices-cms.js'
+  extra_requirements_css: 'silverstripe-timednotices/css/timednotices-cms.css'

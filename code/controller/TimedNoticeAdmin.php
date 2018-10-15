@@ -35,8 +35,11 @@ class TimedNoticeAdmin extends ModelAdmin
 
     /**
      * @var string
+     *
+     * Regression: $menu_icon not currently working in SS4.2. See this linnk for more information:
+     * https://github.com/silverstripe/silverstripe-admin/issues/558
      */
-    private static $menu_icon = 'silverstripe-timednotices/images/bell.png';
+    // private static $menu_icon = 'silverstripe-timednotices/images/bell.png';
 
     /**
      * @var boolean
