@@ -176,7 +176,7 @@ class TimedNotice extends DataObject implements PermissionProvider
         $end   = $fields->dataFieldByName('EndTime');
 
         /**
-         * ToDo: check whether these are needed or not
+         * ToDo: Add a calendar
          */
         // $start->getDateField()->setConfig('showcalendar', true);
         // $end->getDateField()->setConfig('showcalendar', true);
