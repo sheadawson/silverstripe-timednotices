@@ -23,7 +23,6 @@
     },
     "require": {
         "composer/installers": "^1.6",
-        "silverstripe/timepickerfield": "~1.0",
         "unclecheese/display-logic": "^2.0",
         "php": ">=5.6",
         "silverstripe/recipe-core": "^4.2"
