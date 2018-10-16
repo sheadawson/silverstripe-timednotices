@@ -1,6 +1,6 @@
 <?php
 
-namespace MBIE\TimedNotice;
+namespace SheaDawson\TimedNotice;
 
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\ListboxField;
