@@ -1,15 +1,11 @@
 ---
 Name: timednotices
-After:
-  - '#rootroutes'
-  - '#modelascontrollerroutes'
+After: 'rootroutes'
 ---
-Director:
+SilverStripe\Control\Director:
   rules:
-   'timednotice//$Action/$ID/$OtherID': 'TimedNoticeController'
+   'timednotice//$Action/$ID/$OtherID': MBIE\TimedNotice\TimedNoticeController
 
-LeftAndMain:
-  extra_requirements_javascript:
-    - 'timednotices/javascript/timednotices-cms.js'
-  extra_requirements_css:
-    - 'timednotices/css/timednotices-cms.css'
+SilverStripe\Admin\LeftAndMain:
+  extra_requirements_javascript: 'silverstripe-timednotices/javascript/timednotices-cms.js'
+  extra_requirements_css: 'silverstripe-timednotices/css/timednotices-cms.css'

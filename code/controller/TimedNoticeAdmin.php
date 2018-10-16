@@ -1,4 +1,13 @@
 <?php
+
+namespace MBIE\TimedNotice;
+
+use MBIE\TimedNotice\TimedNotice;
+use SilverStripe\Admin\ModelAdmin;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\ORM\ArrayLib;
+
 /**
  * TimedNoticeAdmin
  *
@@ -10,16 +19,31 @@ class TimedNoticeAdmin extends ModelAdmin
     /**
      * @var array
      */
-    private static $managed_models = array(
-        'TimedNotice'
-    );
+    private static $managed_models = [
+        TimedNotice::class
+    ];
 
+    /**
+     * @var string
+     */
     private static $url_segment = 'timed-notices';
 
+    /**
+     * @var string
+     */
     private static $menu_title = 'Timed Notices';
 
-    private static $menu_icon = 'timednotices/images/bell.png';
+    /**
+     * @var string
+     *
+     * Regression: $menu_icon not currently working in SS4.2. See this link for more information:
+     * https://github.com/silverstripe/silverstripe-admin/issues/558
+     */
+    // private static $menu_icon = 'silverstripe-timednotices/images/bell.png';
 
+    /**
+     * @var boolean
+     */
     public $showImportForm = false;
 
     /**
@@ -29,9 +53,9 @@ class TimedNoticeAdmin extends ModelAdmin
      **/
     public function SearchForm()
     {
-        $form   = parent::SearchForm();
+        $form = parent::SearchForm();
         $fields = $form->Fields();
-        $q      = $this->getRequest()->requestVar('q');
+        $q = $this->getRequest()->requestVar('q');
 
         $fields->removeByName('q[MessageType]');
 
@@ -39,8 +63,8 @@ class TimedNoticeAdmin extends ModelAdmin
             DropdownField::create(
                 'q[MessageType]',
                 'Message Type',
-                ArrayLib::valuekey(Config::inst()->get('TimedNotice', 'message_types')),
-                isset($q['MessageType']) ? $q['MessageType'] : null
+                ArrayLib::valuekey(Config::inst()->get(TimedNotice::class, 'message_types')),
+                isset($q['MessageType']) ? $q['MessageType'] : []
             )->setEmptyString(' ')
         );
 
@@ -48,8 +72,8 @@ class TimedNoticeAdmin extends ModelAdmin
             DropdownField::create(
                 'q[Status]',
                 'Status',
-                ArrayLib::valuekey(Config::inst()->get('TimedNotice', 'status_options')),
-                isset($q['Status']) ? $q['Status'] : null
+                ArrayLib::valuekey(Config::inst()->get(TimedNotice::class, 'status_options')),
+                isset($q['Status']) ? $q['Status'] : []
             )->setEmptyString(' ')
         );
 
@@ -71,9 +95,9 @@ class TimedNoticeAdmin extends ModelAdmin
                 $now = date('Y-m-d H:i:s');
                 if ($status == 'Future') {
                     return $list->where("StartTime > '$now'");
-                } elseif ($status == 'Expired') {
+                } else if ($status == 'Expired') {
                     return $list->where("EndTime < $now");
-                } elseif ($status == 'Current') {
+                } else if ($status == 'Current') {
                     return $list->where("
                         StartTime < '$now' AND
                         (EndTime > '$now' OR EndTime IS NULL)

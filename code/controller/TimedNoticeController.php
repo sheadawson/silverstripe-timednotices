@@ -1,4 +1,15 @@
 <?php
+
+namespace MBIE\TimedNotice;
+
+use MBIE\TimedNotice\TimedNotice;
+use SilverStripe\Control\Controller;
+use SilverStripe\Core\Convert;
+use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\Security\Member;
+use SilverStripe\Security\Permission;
+
 /**
  * TimedNoticeController
  *
@@ -10,10 +21,10 @@ class TimedNoticeController extends Controller
     /**
      * @var array
      */
-    private static $allowed_actions = array(
+    private static $allowed_actions = [
         'notices',
         'snooze',
-    );
+    ];
 
     /**
      * Gets any notices relevant to the present time and current users
@@ -22,8 +33,8 @@ class TimedNoticeController extends Controller
      **/
     public function notices($request)
     {
-        $now        = SS_Datetime::now()->getValue();
-        $member    = Member::currentUser();
+        $now = DBDatetime::now()->getValue();
+        $member = Member::currentUser();
         $notices    = TimedNotice::get()->where("
             StartTime < '$now' AND
             (EndTime > '$now' OR EndTime IS NULL)
@@ -31,6 +42,7 @@ class TimedNoticeController extends Controller
 
         if ($notices->count()) {
             $notices = ArrayList::create($notices->toArray());
+
             foreach ($notices as $notice) {
                 if ($notice->CanViewType == 'OnlyTheseUsers') {
                     if ($member && !$member->inGroups($notice->ViewerGroups())) {

@@ -1,20 +1,20 @@
 #timed-notices{
-	padding: 8px 0 0;
-	margin: 0 0 0 -16px;
-	border-bottom: 1px solid #ababab;
-	background: #eceff1;
+    padding: 8px 0 0;
+    margin: 0 0 0 -16px;
+    border-bottom: 1px solid #ababab;
+    background: #eceff1;
 }
 
 #timed-notices .message{
-	margin: 0px 8px 8px;
+    margin: 0px 8px 8px;
 }
 
 #timed-notices .notice-time
 {
     float: right;
-    margin-right: 10px;
+    margin: 0 10px;
 }
 
 #timed-notices .notice-snoozer {
-	float: right;
+    float: right;
 }

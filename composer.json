@@ -1,23 +1,30 @@
 {
-	"name": "sheadawson/silverstripe-timednotices",
-	"description": "Display notice banners in the cms interface over a given time period. Good for notifying cms users of scheduled updates or downtime etc.",
-	"type": "silverstripe-module",
-	"keywords": ["silverstripe", "notification"],
-	"homepage": "http://github.com/sheadawson/silverstripe-timednotices",
-	"authors": [
-	{
-		"name": "Shea Dawson",
-		"email": "shea@silverstripe.com.au"
-	}
-	],
-	"require":
-	{
-		"composer/installers": "*",
-		"silverstripe/framework": "~3.1",
-		"silverstripe/timepickerfield": "~1.0",
-		"unclecheese/display-logic": "*"
-	},
-	"extra": {
-		"installer-name": "timednotices"
-	}
+    "name": "sheadawson/silverstripe-timednotices",
+    "description": "Display notice banners in the cms interface over a given time period. Good for notifying cms users of scheduled updates or downtime etc.",
+    "type": "silverstripe-vendormodule",
+    "keywords": [
+        "silverstripe",
+        "notification"
+    ],
+    "homepage": "http://github.com/sheadawson/silverstripe-timednotices",
+    "authors": [
+        {
+            "name": "Shea Dawson",
+            "email": "shea@silverstripe.com.au"
+        }
+    ],
+    "extra": {
+        "installer-name": "timednotices",
+        "expose": [
+            "css",
+            "javascript",
+            "images"
+        ]
+    },
+    "require": {
+        "composer/installers": "^1.6",
+        "unclecheese/display-logic": "^2.0",
+        "php": ">=5.6",
+        "silverstripe/recipe-core": "^4.2"
+    }
 }
