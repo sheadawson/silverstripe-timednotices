@@ -1,8 +1,8 @@
 <?php
 
-namespace MBIE\TimedNotice;
+namespace SheaDawson\TimedNotice;
 
-use MBIE\TimedNotice\TimedNotice;
+use SheaDawson\TimedNotice\TimedNotice;
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Convert;
 use SilverStripe\ORM\FieldType\DBDatetime;

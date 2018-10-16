@@ -4,8 +4,10 @@ After: 'rootroutes'
 ---
 SilverStripe\Control\Director:
   rules:
-   'timednotice//$Action/$ID/$OtherID': MBIE\TimedNotice\TimedNoticeController
+   'timednotice//$Action/$ID/$OtherID': SheaDawson\TimedNotice\TimedNoticeController
 
 SilverStripe\Admin\LeftAndMain:
-  extra_requirements_javascript: 'silverstripe-timednotices/javascript/timednotices-cms.js'
-  extra_requirements_css: 'silverstripe-timednotices/css/timednotices-cms.css'
+  extra_requirements_javascript:
+    - 'sheadawson/silverstripe-timednotices: javascript/timednotices-cms.js'
+  extra_requirements_css:
+    - 'sheadawson/silverstripe-timednotices: css/timednotices-cms.css'

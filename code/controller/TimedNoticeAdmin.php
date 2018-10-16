@@ -1,8 +1,8 @@
 <?php
 
-namespace MBIE\TimedNotice;
+namespace SheaDawson\TimedNotice;
 
-use MBIE\TimedNotice\TimedNotice;
+use SheaDawson\TimedNotice\TimedNotice;
 use SilverStripe\Admin\ModelAdmin;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\DropdownField;
