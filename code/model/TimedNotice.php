@@ -9,9 +9,11 @@ use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\Forms\TimeField;
 use SilverStripe\ORM\ArrayLib;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\Security\Group;
+use SilverStripe\Security\Member;
 use SilverStripe\Security\PermissionProvider;
 use SilverStripe\Security\Permission;
 use UncleCheese\DisplayLogic\Extensions\DisplayLogic;
@@ -39,11 +41,12 @@ class TimedNotice extends DataObject implements PermissionProvider
      * @var array
      */
     private static $db = [
+        'Context'        => "Enum('Website,CMS','CMS')",
         'Message'        => 'Text',
         'MessageType'    => 'Varchar',
         'StartTime'      => 'Datetime',
         'EndTime'        => 'Datetime',
-        'CanViewType'    => 'Enum("LoggedInUsers, OnlyTheseUsers, LoggedInUsers")',
+        'CanViewType'    => 'Enum("Anyone, LoggedInUsers, OnlyTheseUsers, LoggedInUsers")',
     ];
 
     /**
@@ -109,6 +112,12 @@ class TimedNotice extends DataObject implements PermissionProvider
         $fields = parent::getCMSFields();
 
         $fields->removeFieldFromTab('Root', 'ViewerGroups');
+
+        // prepare options for the target groups
+        $viewersOptionsSource['Anyone'] = _t(
+            'TimedNotice.ANYONE',
+            'Anyone'
+        );
 
         $viewersOptionsSource['LoggedInUsers'] = _t(
             'TimedNotice.ACCESSLOGGEDIN',
@@ -216,6 +225,45 @@ class TimedNotice extends DataObject implements PermissionProvider
     }
 
     /**
+     * Gets any notices relevant to the present time, context and current users
+     *
+     * @param string $context (default: CMS)
+     * @return ArrayList
+     **/
+    public static function get_notices($context = null)
+    {
+        // fallback to the CMS as the context - this is required to be consistent with the original behaviour.
+        if ($context == null) {
+            $context = 'CMS';
+        }
+
+         // prepare and filter the possible result
+        $now     = DBDatetime::now()->getValue();
+        $member  = Member::currentUser();
+
+        $notices = TimedNotice::get()->filter("Context", $context);
+
+        // Context = '{$context}' AND
+        // StartTime < '{$now}' AND
+        // (EndTime > '{$now}' OR EndTime IS NULL)
+
+         // if there are notices verify if those are allowed for this group
+        if ($notices->count()) {
+            // turn the DataList into an ArrayList to make it editable.
+            $notices = ArrayList::create($notices->toArray());
+             foreach ($notices as $notice) {
+                if ($notice->CanViewType == 'OnlyTheseUsers') {
+                    if ($member && !$member->inGroups($notice->ViewerGroups())) {
+                        $notices->remove($notice);
+                    }
+                }
+            }
+        }
+
+         return $notices;
+    }
+
+    /**
      * @return boolean
      */
     public function canView($member = null)
@@ -269,6 +317,7 @@ class TimedNotice extends DataObject implements PermissionProvider
     {
         return RequiredFields::create(
             [
+                'Context',
                 'Message',
                 'StartTime'
             ]
@@ -278,7 +327,7 @@ class TimedNotice extends DataObject implements PermissionProvider
     /**
      * @return TimedNotice $notice
      */
-    public static function add_notice($message, $end, $start = null, $type = 'good', $viewBy = null)
+    public static function add_notice($message, $context, $end, $start = null, $type = 'good', $viewBy = null)
     {
         if (!$start) {
             $start = DBDatetime::now()->getValue();
@@ -291,12 +340,17 @@ class TimedNotice extends DataObject implements PermissionProvider
         $notice = TimedNotice::create(
             [
                 'Message'        => $message,
+                'Context'        => $context,
                 'StartTime'      => $start,
                 'EndTime'        => $end,
                 'CanViewType'    => 'LoggedInUsers',
                 'MessageType'    => $type,
             ]
         );
+
+        if ($viewBy == 'Anyone') {
+            $notice->CanViewType = 'Anyone';
+        }
 
         if ($viewBy instanceof Group) {
             $notice->CanViewType = 'OnlyTheseUsers';
