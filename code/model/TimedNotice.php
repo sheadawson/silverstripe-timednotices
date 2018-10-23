@@ -241,11 +241,17 @@ class TimedNotice extends DataObject implements PermissionProvider
         $now     = DBDatetime::now()->getValue();
         $member  = Member::currentUser();
 
-        $notices = TimedNotice::get()->filter("Context", $context);
-
-        // Context = '{$context}' AND
-        // StartTime < '{$now}' AND
-        // (EndTime > '{$now}' OR EndTime IS NULL)
+        $notices = TimedNotice::get()->filter(
+            [
+                "Context" => $context,
+                "StartTime:LessThan" => $now
+            ]
+        )->filterAny(
+            [
+                "EndTime:GreaterThan" => $now,
+                "EndTime" => null
+            ]
+        );
 
          // if there are notices verify if those are allowed for this group
         if ($notices->count()) {
